@@ -68,7 +68,7 @@ final class ExpressionParser {
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
                     break
-                case ".":
+                case ".", ":":
                     state = .leadingDot
                 case "(", ")", ",", "{", "}", "&", "$", "#", "^", "/", "<", ">":
                     state = .error("Unexpected character `\(c)` at index \(string.distance(from: string.startIndex, to: i))")
@@ -80,7 +80,7 @@ final class ExpressionParser {
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
                     state = .doneExpressionPlusWhiteSpace(expression: Expression.implicitIterator)
-                case ".":
+                case ".", ":":
                     state = .error("Unexpected character `\(c)` at index \(string.distance(from: string.startIndex, to: i))")
                 case "(":
                     filterExpressionStack.append(Expression.implicitIterator)
@@ -112,7 +112,7 @@ final class ExpressionParser {
                 case " ", "\r", "\n", "\r\n", "\t":
                     let identifier = String(string[identifierStart..<i])
                     state = .doneExpressionPlusWhiteSpace(expression: Expression.identifier(identifier: identifier))
-                case ".":
+                case ".", ":":
                     let identifier = String(string[identifierStart..<i])
                     state = .waitingForScopingIdentifier(baseExpression: Expression.identifier(identifier: identifier))
                 case "(":
@@ -147,7 +147,7 @@ final class ExpressionParser {
                     let identifier = String(string[identifierStart..<i])
                     let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                     state = .doneExpressionPlusWhiteSpace(expression: scopedExpression)
-                case ".":
+                case ".", ":":
                     let identifier = String(string[identifierStart..<i])
                     let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                     state = .waitingForScopingIdentifier(baseExpression: scopedExpression)
@@ -184,7 +184,7 @@ final class ExpressionParser {
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
                     state = .error("Unexpected white space character at index \(string.distance(from: string.startIndex, to: i))")
-                case ".":
+                case ".", ":":
                     state = .error("Unexpected character `\(c)` at index \(string.distance(from: string.startIndex, to: i))")
                 case "(":
                     state = .error("Unexpected character `\(c)` at index \(string.distance(from: string.startIndex, to: i))")
@@ -202,7 +202,7 @@ final class ExpressionParser {
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
                     state = .doneExpressionPlusWhiteSpace(expression: doneExpression)
-                case ".":
+                case ".", ":":
                     state = .waitingForScopingIdentifier(baseExpression: doneExpression)
                 case "(":
                     filterExpressionStack.append(doneExpression)
@@ -231,8 +231,8 @@ final class ExpressionParser {
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
                     break
-                case ".":
-                    // Prevent "a .b"
+                case ".", ":":
+                    // Prevent "a .b", "a :b"
                     state = .error("Unexpected character `\(c)` at index \(string.distance(from: string.startIndex, to: i))")
                 case "(":
                     // Accept "a (b)"
